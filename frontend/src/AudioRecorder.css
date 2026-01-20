@@ -1,85 +1,53 @@
 .audio-recorder {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  padding: 2rem;
 }
 
 .recorder-container {
-  background: white;
-  border-radius: 24px;
-  padding: 3rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 500px;
   width: 100%;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .recorder-visualizer {
-  margin-bottom: 2rem;
+  height: 80px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: 200px;
+  justify-content: center;
+  margin-bottom: 0.5rem;
 }
 
 .recording-circle {
-  width: 120px;
-  height: 120px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: white;
+  border: 4px solid #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  transition: transform 0.1s ease-out, opacity 0.2s ease;
-  position: relative;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+  color: #3b82f6;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .recording-circle.recording {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  animation: pulse 2s ease-in-out infinite;
+  background: #ef4444;
+  border-color: #fee2e2;
+  color: white;
+  transform: scale(1.1);
 }
 
 .recording-circle.processing {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
-
-@keyframes pulse {
-  0%, 100% {
-    box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
-  }
-  50% {
-    box-shadow: 0 10px 50px rgba(245, 87, 108, 0.8);
-  }
-}
-
-.pulse-ring {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.8);
-  animation: ripple 1.5s ease-out infinite;
-}
-
-@keyframes ripple {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
+  border-color: #3b82f6;
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(59, 130, 246, 0.1);
+  border-top-color: #3b82f6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -91,102 +59,91 @@
 }
 
 .recorder-controls {
-  margin-bottom: 1.5rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .btn-record,
 .btn-stop,
 .btn-processing {
-  padding: 1rem 2.5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
+  width: 100%;
+  max-width: 240px;
+  padding: 1rem;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .btn-record {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #3b82f6;
   color: white;
 }
 
 .btn-record:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  background: #2563eb;
 }
 
 .btn-stop {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: #ef4444;
   color: white;
-}
-
-.btn-stop:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
 }
 
 .btn-processing {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: white;
+  background: #f9fafb;
+  color: #94a3b8;
   cursor: not-allowed;
-  opacity: 0.8;
-}
-
-.btn-icon {
-  font-size: 1.5rem;
+  box-shadow: none;
 }
 
 .error-message {
-  background: #fee;
-  color: #c33;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-  border-left: 4px solid #c33;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.85rem;
+  color: #ef4444;
+  text-align: center;
 }
 
 .recorder-status {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
 }
 
 .status-indicator {
-  display: inline-flex;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
-  color: #666;
-  padding: 0.5rem 1rem;
-  background: #f5f5f5;
-  border-radius: 20px;
+}
+
+.recording-indicator {
+  color: #ef4444;
+}
+
+.processing-indicator {
+  color: #3b82f6;
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: #999;
-  animation: blink 1.5s ease-in-out infinite;
+  background: currentColor;
 }
 
 .recording-indicator .status-dot {
-  background: #f5576c;
+  animation: pulse-dot 1s infinite;
 }
 
-.processing-indicator .status-dot {
-  background: #4facfe;
-}
-
-@keyframes blink {
-  0%, 100% {
-    opacity: 1;
-  }
+@keyframes pulse-dot {
   50% {
-    opacity: 0.3;
+    opacity: 0.4;
   }
 }

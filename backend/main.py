@@ -27,8 +27,8 @@ def read_root():
 @app.post("/agent/emergency")
 async def trigger_emergency_action(payload: Dict[str, Any]):
     print(f"DEBUG: Received emergency trigger with payload: {payload}")
-    await executeEmergencyAction(payload)
-    return {"status": "agent_action_processed"}
+    result = await executeEmergencyAction(payload)
+    return result
 
 @app.post("/transcribe")
 async def transcribe_audio(file: UploadFile = File(...)):

@@ -46,7 +46,7 @@ const AudioRecorder = ({ onTranscript }) => {
       mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
         await sendAudioToBackend(audioBlob)
-        
+
         // Stop all tracks
         stream.getTracks().forEach(track => track.stop())
         streamRef.current = null
@@ -68,7 +68,7 @@ const AudioRecorder = ({ onTranscript }) => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop()
       setIsRecording(false)
-      
+
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
@@ -88,14 +88,14 @@ const AudioRecorder = ({ onTranscript }) => {
 
     const updateLevel = () => {
       if (!isRecording) return
-      
+
       analyser.getByteFrequencyData(dataArray)
       const average = dataArray.reduce((a, b) => a + b) / dataArray.length
       setAudioLevel(average / 255)
-      
+
       animationFrameRef.current = requestAnimationFrame(updateLevel)
     }
-    
+
     updateLevel()
   }
 
@@ -135,7 +135,7 @@ const AudioRecorder = ({ onTranscript }) => {
     <div className="audio-recorder">
       <div className="recorder-container">
         <div className="recorder-visualizer">
-          <div 
+          <div
             className={`recording-circle ${isRecording ? 'recording' : ''} ${isProcessing ? 'processing' : ''}`}
             style={{
               transform: `scale(${1 + (isRecording ? audioLevel * 0.5 : 0)})`,
@@ -147,7 +147,7 @@ const AudioRecorder = ({ onTranscript }) => {
             ) : isRecording ? (
               <div className="pulse-ring"></div>
             ) : (
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
                 <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                 <line x1="12" y1="19" x2="12" y2="23" />
@@ -159,7 +159,7 @@ const AudioRecorder = ({ onTranscript }) => {
 
         <div className="recorder-controls">
           {!isRecording && !isProcessing ? (
-            <button 
+            <button
               className="btn-record"
               onClick={startRecording}
               aria-label="Start recording"
@@ -168,7 +168,7 @@ const AudioRecorder = ({ onTranscript }) => {
               <span>Start Recording</span>
             </button>
           ) : isRecording ? (
-            <button 
+            <button
               className="btn-stop"
               onClick={stopRecording}
               aria-label="Stop recording"
@@ -177,7 +177,7 @@ const AudioRecorder = ({ onTranscript }) => {
               <span>Stop Recording</span>
             </button>
           ) : (
-            <button 
+            <button
               className="btn-processing"
               disabled
             >

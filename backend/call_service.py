@@ -1,8 +1,11 @@
 import os
 from twilio.rest import Client
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+# Load from specific path to be safe
+env_path = Path(__file__).parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 class CallService:
     """
@@ -39,20 +42,20 @@ class CallService:
         twiml_content = f'<Response><Say voice="alice">{message}</Say></Response>'
 
         if self.client and self.from_number and self.doctor_number:
-            print(f"🚀 [AGENT ACTION] Initiating REAL Twilio call to {self.doctor_number}...")
+            print(f"[AGENT ACTION] Initiating REAL Twilio call to {self.doctor_number}...")
             try:
                 call = self.client.calls.create(
                     to=self.doctor_number,
                     from_=self.from_number,
                     twiml=twiml_content
                 )
-                print(f"✅ Call initiated successfully. SID: {call.sid}")
+                print(f"OK: Call initiated successfully. SID: {call.sid}")
                 return True
             except Exception as e:
-                print(f"❌ Error making Twilio call: {e}")
+                print(f"ERROR: Error making Twilio call: {e}")
                 return False
         else:
-            print("⚠️ [AGENT ACTION] DRY RUN: Missing Twilio credentials. Simulation mode.")
+            print("WARNING: [AGENT ACTION] DRY RUN: Missing Twilio credentials. Simulation mode.")
             print(f"--- Faked Call Content ---")
             print(f"From: {self.from_number or 'DEMO_NUMBER'}")
             print(f"To: {self.doctor_number or 'DOCTOR_NUMBER'}")

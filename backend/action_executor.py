@@ -13,9 +13,10 @@ Responsibilities:
 _emergency_already_triggered: bool = False
 
 
-async def executeEmergencyAction(context: Dict[str, Any]) -> None:
+async def executeEmergencyAction(context: Dict[str, Any]) -> Dict[str, Any]:
     """
     Execute emergency actions based on structured risk context.
+    Returns status dictionary.
     """
     global _emergency_already_triggered
 
@@ -32,7 +33,7 @@ async def executeEmergencyAction(context: Dict[str, Any]) -> None:
 
     if risk != "high" or confidence < 0.7:
         print("AGENT ACTION NOT EXECUTED: conditions not met.")
-        return
+        return {"status": "ignored", "reason": "risk_or_confidence_too_low"}
 
     _emergency_already_triggered = True
 
@@ -47,7 +48,16 @@ async def executeEmergencyAction(context: Dict[str, Any]) -> None:
         print(f"Reason: {reason}")
         print(f"Symptoms: {symptoms}")
         print(f"Confidence: {confidence}")
+        
+        # Determine if it was a real call or dry run
+        is_dry_run = not (call_service.account_sid and call_service.auth_token)
+        return {
+            "status": "success", 
+            "is_dry_run": is_dry_run,
+            "message": "Twilio call initiated" if not is_dry_run else "DRY RUN: Call simulated"
+        }
     else:
         print("Failed to execute emergency call.")
+        return {"status": "error", "message": "Twilio call failed"}
     print("================================")
 

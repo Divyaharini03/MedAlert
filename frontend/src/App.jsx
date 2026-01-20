@@ -7,6 +7,7 @@ function App() {
   const [latestAdvice, setLatestAdvice] = useState(null)
   const [manualText, setManualText] = useState('')
   const [isCalling, setIsCalling] = useState(false)
+  const [callStatus, setCallStatus] = useState(null)
   const emergencyTriggeredRef = useRef(false)
 
   const riskPalette = useMemo(() => ({
@@ -262,6 +263,7 @@ function App() {
 
     try {
       setIsCalling(true)
+      setCallStatus(null)
       const response = await fetch('http://localhost:8000/agent/emergency', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -269,8 +271,16 @@ function App() {
       })
       const data = await response.json()
       console.log('Backend response:', data)
+      setCallStatus(data)
+
+      // Reset indicator after a delay
+      setTimeout(() => {
+        setIsCalling(false)
+      }, 5000)
     } catch (err) {
       console.error('Failed to notify emergency action layer', err)
+      setIsCalling(false)
+      setCallStatus({ status: 'error', message: 'Network error' })
     }
   }
 
@@ -310,106 +320,159 @@ function App() {
 
   return (
     <div className="app">
-      <div className="app-container">
-        <header className="app-header">
-          <h1 className="app-title">
-            <span className="title-icon">🏥</span>
-            MedAlert
-          </h1>
-          <p className="app-subtitle">Speech-to-Text Transcription</p>
-        </header>
+      {/* Sidebar Navigation */}
+      <aside className="sidebar">
+        <div className="sidebar-logo">🏥</div>
+        <div className="nav-item active">
+          <span className="nav-icon">🏠</span>
+          <span className="nav-label">Home</span>
+        </div>
+        <div className="nav-item">
+          <span className="nav-icon">📜</span>
+          <span className="nav-label">History</span>
+        </div>
+        <div className="nav-item">
+          <span className="nav-icon">📊</span>
+          <span className="nav-label">Stats</span>
+        </div>
+        <div className="nav-item">
+          <span className="nav-icon">👤</span>
+          <span className="nav-label">Profile</span>
+        </div>
+      </aside>
 
-        <main className="app-main">
-          {latestAdvice && latestAdvice.risk === 'high' && (
-            <div className="alert-bar">
-              <span className="alert-pill">ALERT</span>
-              <span className="alert-text">
-                This may represent a higher-risk situation. {isCalling ? <strong>AUTONOMOUS CALL INITIATED: Calling doctor...</strong> : "If you or someone else feels unsafe or very unwell, contact local emergency services or a clinician immediately."}
-              </span>
+      <div className="app-container">
+        {/* Emergency Overlay */}
+        {latestAdvice && latestAdvice.risk === 'high' && !emergencyTriggeredRef.current && (
+          <div className="alert-overlay">
+            <div className="alert-icon-big">🚨</div>
+            <div className="alert-message-big">{latestAdvice.title}</div>
+            <p>{latestAdvice.message}</p>
+            {isCalling && (
+              <div className="call-status-detail" style={{ color: 'white', marginTop: '1rem', fontWeight: 700 }}>
+                {callStatus?.is_dry_run ? "Simulation Mode: No real call made." : "Autonomous Call Initiated..."}
+              </div>
+            )}
+            <button className="btn-dismiss" onClick={() => emergencyTriggeredRef.current = true}>
+              Dismiss Alert
+            </button>
+          </div>
+        )}
+
+        <main className="main-column">
+          <header className="app-header">
+            <div className="app-title">
+              <span className="title-icon">🏥</span>
+              MedAlert Dashboard
             </div>
-          )}
+            <div className="user-profile-sm">
+              <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 600 }}>Pro Account</span>
+            </div>
+          </header>
+
+          <div className="search-area">
+            <form className="manual-form" onSubmit={handleManualSubmit}>
+              <span className="search-icon">🔍</span>
+              <input
+                type="text"
+                value={manualText}
+                onChange={(e) => setManualText(e.target.value)}
+                placeholder="Search symptoms or patient events..."
+                aria-label="Search symptoms"
+              />
+              <button type="submit">Analyze</button>
+            </form>
+          </div>
+
+          <div className="categories-row">
+            <div className="chip active">All Events</div>
+            <div className="chip">High Risk</div>
+            <div className="chip">Elevated</div>
+            <div className="chip">Normal</div>
+          </div>
+
+          <section className="hero-section">
+            <div className="banner-card">
+              <div className="banner-image-placeholder">💊</div>
+              <div className="banner-subtitle">Current Patient Status</div>
+              <h2 className="banner-title">
+                {latestAdvice ? latestAdvice.title : "Waiting for Input"}
+              </h2>
+              <p className="banner-subtitle">
+                {latestAdvice ? latestAdvice.message : "Use voice or text to describe patient symptoms for immediate agentic analysis."}
+              </p>
+            </div>
+          </section>
 
           <section className="recorder-section">
             <AudioRecorder onTranscript={handleTranscript} />
           </section>
 
-          <section className="manual-section">
-            <div className="manual-header">
-              <h2>Type Symptoms</h2>
-              <p className="manual-subtitle">Enter symptoms to get advice as text and speech</p>
+          <section className="symptoms-section">
+            <div className="section-header">
+              <h2>Quick Diagnostic Shortcuts</h2>
             </div>
-            <form className="manual-form" onSubmit={handleManualSubmit}>
-              <input
-                type="text"
-                value={manualText}
-                onChange={(e) => setManualText(e.target.value)}
-                placeholder="e.g., I have fever and cough"
-                aria-label="Type your symptoms"
-              />
-              <button type="submit">Get Advice</button>
-            </form>
-          </section>
-
-          <section className="advice-section">
-            <div className="advice-header">
-              <h2>Advice</h2>
-              <p className="advice-subtitle">Auto-generated guidance from detected terms</p>
-            </div>
-            {latestAdvice ? (
-              <div className="advice-card" style={{ borderColor: riskPalette[latestAdvice.risk] }}>
-                <div className="advice-tag" style={{ background: riskPalette[latestAdvice.risk] }}>
-                  {latestAdvice.risk.toUpperCase()}
-                </div>
-                <h3>{latestAdvice.title}</h3>
-                <p>{latestAdvice.message}</p>
+            <div className="symptom-icons-row">
+              <div className="symptom-item" onClick={() => handleTranscript("I have chest pain")}>
+                <div className="icon-circle">🫀</div>
+                <span className="symptom-label">Chest Pain</span>
               </div>
-            ) : (
-              <div className="advice-empty">
-                <div className="empty-icon">💡</div>
-                <p>No advice yet</p>
-                <p className="empty-hint">Say a symptom like “fever” to get guidance</p>
+              <div className="symptom-item" onClick={() => handleTranscript("I have a headache")}>
+                <div className="icon-circle">🧠</div>
+                <span className="symptom-label">Neurological</span>
               </div>
-            )}
-          </section>
-
-          <section className="transcripts-section">
-            <div className="transcripts-header">
-              <h2>Transcripts</h2>
-              {entries.length > 0 && (
-                <button className="btn-clear" onClick={clearTranscripts}>
-                  Clear All
-                </button>
-              )}
-            </div>
-
-            <div className="transcripts-list">
-              {entries.length === 0 ? (
-                <div className="empty-state">
-                  <div className="empty-icon">📝</div>
-                  <p>No transcripts yet</p>
-                  <p className="empty-hint">Start recording to see your transcripts here</p>
-                </div>
-              ) : (
-                entries.map((item) => (
-                  <div key={item.id} className="transcript-card">
-                    <div className="transcript-header">
-                      <span className="transcript-time">{item.timestamp}</span>
-                      {item.advice && (
-                        <span
-                          className="transcript-badge"
-                          style={{ background: riskPalette[item.advice.risk] }}
-                        >
-                          {item.advice.title}
-                        </span>
-                      )}
-                    </div>
-                    <div className="transcript-text">{item.text}</div>
-                  </div>
-                ))
-              )}
+              <div className="symptom-item" onClick={() => handleTranscript("I have a fever")}>
+                <div className="icon-circle">🌡️</div>
+                <span className="symptom-label">Vitals/Fever</span>
+              </div>
+              <div className="symptom-item" onClick={() => handleTranscript("I am coughing")}>
+                <div className="icon-circle">🫁</div>
+                <span className="symptom-label">Respiratory</span>
+              </div>
+              <div className="symptom-item" onClick={() => handleTranscript("I am bleeding heavily")}>
+                <div className="icon-circle">🩸</div>
+                <span className="symptom-label">Bleeding/Trauma</span>
+              </div>
             </div>
           </section>
         </main>
+
+        <aside className="history-panel">
+          <div className="panel-header">
+            <h2>Emergency History</h2>
+            {entries.length > 0 && (
+              <button className="btn-clear" style={{ background: 'none', border: 'none', color: '#3b82f6', fontWeight: 600, cursor: 'pointer' }} onClick={clearTranscripts}>
+                Clear All
+              </button>
+            )}
+          </div>
+
+          <div className="transcripts-list">
+            {entries.length === 0 ? (
+              <div className="empty-state" style={{ textAlign: 'center', padding: '3rem 1rem', color: '#94a3b8' }}>
+                <p>No recent activities detected.</p>
+              </div>
+            ) : (
+              entries.map((item) => (
+                <div key={item.id} className="transcript-card">
+                  <div
+                    className="card-status-indicator"
+                    style={{ background: riskPalette[item.advice?.risk || 'low'] }}
+                  ></div>
+                  <div className="card-content">
+                    <div className="card-top">
+                      <span className="card-status-label" style={{ color: riskPalette[item.advice?.risk || 'low'] }}>
+                        {item.advice?.risk.toUpperCase() || 'NORMAL'}
+                      </span>
+                      <span className="card-time">{item.timestamp}</span>
+                    </div>
+                    <div className="card-text">{item.text}</div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </aside>
       </div>
     </div>
   )
