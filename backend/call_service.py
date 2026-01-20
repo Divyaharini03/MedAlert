@@ -16,13 +16,19 @@ class CallService:
         self.auth_token = os.getenv("TWILIO_AUTH_TOKEN")
         self.from_number = os.getenv("TWILIO_PHONE_NUMBER")
         self.doctor_number = os.getenv("DOCTOR_PHONE_NUMBER")
+        print(f"DEBUG: Twilio from_number: {self.from_number}")
+        print(f"DEBUG: Twilio doctor_number: {self.doctor_number}")
         
         self.client = None
         if self.account_sid and self.auth_token:
+            print(f"DEBUG: Twilio SID loaded: {self.account_sid[:5]}...{self.account_sid[-5:]}")
             try:
                 self.client = Client(self.account_sid, self.auth_token)
+                print("DEBUG: Twilio Client initialized.")
             except Exception as e:
-                print(f"Failed to initialize Twilio client: {e}")
+                print(f"DEBUG: Failed to initialize Twilio client: {e}")
+        else:
+            print("DEBUG: Twilio credentials NOT found in environment.")
 
     def make_emergency_call(self, reason: str, symptoms: list):
         """

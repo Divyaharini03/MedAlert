@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1768927006029,
+    "text": "I have chest pain",
+    "timestamp": "10:06:46 PM",
+    "date": "2026-01-20",
+    "advice": {
+      "title": "Elevated Concern",
+      "message": "Chest pain can be serious. Seek urgent medical attention or call emergency services if severe, sudden, radiating, or with shortness of breath.",
+      "risk": "high"
+    }
+  },
+  {
+    "id": 1768926984583,
+    "text": "I have a fever",
+    "timestamp": "10:06:24 PM",
+    "date": "2026-01-20",
+    "advice": {
+      "title": "Fever Detected",
+      "message": "Monitor temperature, hydrate, and rest. If fever exceeds 103\u00b0F (39.4\u00b0C), lasts >3 days, or pairs with chest pain or shortness of breath, seek care promptly.",
+      "risk": "elevated"
+    }
+  },
+  {
+    "id": 1768926846548,
+    "text": "I have chest pain",
+    "timestamp": "10:04:06 PM",
+    "date": "2026-01-20",
+    "advice": {
+      "title": "Elevated Concern",
+      "message": "Chest pain can be serious. Seek urgent medical attention or call emergency services if severe, sudden, radiating, or with shortness of breath.",
+      "risk": "high"
+    }
+  },
+  {
+    "id": 1768926759695,
+    "text": "I have chest pain",
+    "timestamp": "10:02:39 PM",
+    "date": "2026-01-20",
+    "advice": {
+      "title": "Elevated Concern",
+      "message": "Chest pain can be serious. Seek urgent medical attention or call emergency services if severe, sudden, radiating, or with shortness of breath.",
+      "risk": "high"
+    }
+  },
+  {
+    "id": 1768926756094,
+    "text": "I have fever",
+    "timestamp": "10:02:36 PM",
+    "date": "2026-01-20",
+    "advice": {
+      "title": "Fever Detected",
+      "message": "Monitor temperature, hydrate, and rest. If fever exceeds 103\u00b0F (39.4\u00b0C), lasts >3 days, or pairs with chest pain or shortness of breath, seek care promptly.",
+      "risk": "elevated"
+    }
+  },
+  {
+    "id": 1768926652168,
+    "text": "I feel dizzy",
+    "timestamp": "10:00:52 PM",
+    "date": "2026-01-20",
+    "advice": {
+      "title": "Dizziness Noted",
+      "message": "Sit or lie down to avoid falls, hydrate, and rise slowly. If severe, persistent, fainting, or with chest pain/shortness of breath, seek care.",
+      "risk": "elevated"
+    }
+  },
+  {
+    "id": 1768926642895,
+    "text": "I have sore throat",
+    "timestamp": "10:00:42 PM",
+    "date": "2026-01-20",
+    "advice": {
+      "title": "Sore Throat Noted",
+      "message": "Hydrate, use warm saline gargles, and rest. If severe pain, trouble swallowing, or high fever, seek medical advice.",
+      "risk": "elevated"
+    }
+  },
+  {
+    "id": 1768926600146,
+    "text": "I have chest pain",
+    "timestamp": "10:00:00 PM",
+    "date": "2026-01-20",
+    "advice": {
+      "title": "Elevated Concern",
+      "message": "Chest pain can be serious. Seek urgent medical attention or call emergency services if severe, sudden, radiating, or with shortness of breath.",
+      "risk": "high"
+    }
+  }
+]

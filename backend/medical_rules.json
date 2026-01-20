@@ -1,0 +1,301 @@
+[
+    {
+        "name": "Chest Pain",
+        "keywords": [
+            "chest pain",
+            "tight chest",
+            "pressure chest",
+            "angina"
+        ],
+        "title": "Elevated Concern",
+        "message": "Chest pain can be serious. Seek urgent medical attention or call emergency services if severe, sudden, radiating, or with shortness of breath.",
+        "risk": "high"
+    },
+    {
+        "name": "Shortness of Breath",
+        "keywords": [
+            "shortness of breath",
+            "hard to breathe",
+            "breathless",
+            "difficulty breathing",
+            "cant breathe",
+            "cant breath"
+        ],
+        "title": "Breathing Concern",
+        "message": "Breathing difficulty warrants caution. If sudden, severe, or with chest pain, seek urgent medical attention.",
+        "risk": "high"
+    },
+    {
+        "name": "Cough",
+        "keywords": [
+            "cough",
+            "coughing"
+        ],
+        "title": "Cough Noted",
+        "message": "Stay hydrated. If cough is persistent, with fever or shortness of breath, or produces blood, seek medical advice.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Fever",
+        "keywords": [
+            "fever",
+            "high temp",
+            "temperature",
+            "hot"
+        ],
+        "title": "Fever Detected",
+        "message": "Monitor temperature, hydrate, and rest. If fever exceeds 103°F (39.4°C), lasts >3 days, or pairs with chest pain or shortness of breath, seek care promptly.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Sore Throat",
+        "keywords": [
+            "sore throat",
+            "throat pain",
+            "scratchy throat"
+        ],
+        "title": "Sore Throat Noted",
+        "message": "Hydrate, use warm saline gargles, and rest. If severe pain, trouble swallowing, or high fever, seek medical advice.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Headache",
+        "keywords": [
+            "headache",
+            "migraine"
+        ],
+        "title": "Headache Noted",
+        "message": "Rest, hydrate, and consider appropriate OTC relief. If sudden severe “worst-ever” headache, with fever, neck stiffness, or neuro symptoms, seek care urgently.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Dizziness",
+        "keywords": [
+            "dizzy",
+            "dizziness",
+            "lightheaded"
+        ],
+        "title": "Dizziness Noted",
+        "message": "Sit or lie down to avoid falls, hydrate, and rise slowly. If severe, persistent, fainting, or with chest pain/shortness of breath, seek care.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Confusion",
+        "keywords": [
+            "confused",
+            "confusion",
+            "disoriented"
+        ],
+        "title": "Confusion Noted",
+        "message": "Confusion is concerning. Ensure safety, and seek medical evaluation promptly, especially if sudden onset.",
+        "risk": "high"
+    },
+    {
+        "name": "Nausea",
+        "keywords": [
+            "nausea",
+            "nauseous",
+            "vomit",
+            "vomiting"
+        ],
+        "title": "Nausea/Vomiting Noted",
+        "message": "Small sips of clear fluids and rest. If unable to keep fluids down, signs of dehydration, blood in vomit, or severe pain, seek care.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Diarrhea",
+        "keywords": [
+            "diarrhea",
+            "loose stool"
+        ],
+        "title": "Diarrhea Noted",
+        "message": "Hydrate with electrolytes. If persistent, bloody, with fever, or signs of dehydration, seek medical advice.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Abdominal Pain",
+        "keywords": [
+            "abdominal pain",
+            "stomach pain",
+            "belly pain",
+            "abdomen hurts"
+        ],
+        "title": "Abdominal Pain Noted",
+        "message": "Rest, hydrate, and monitor. If severe, worsening, localized (e.g., right-lower abdomen), or with fever/vomiting, seek medical care.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Rash",
+        "keywords": [
+            "rash",
+            "hives"
+        ],
+        "title": "Rash Noted",
+        "message": "Monitor the rash. If rapidly spreading, painful, with fever or breathing issues, seek medical attention.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Fatigue",
+        "keywords": [
+            "fatigue",
+            "tiredness",
+            "exhausted"
+        ],
+        "title": "Fatigue Noted",
+        "message": "Rest and hydrate. If severe, persistent, or with chest pain, shortness of breath, or weight loss, seek medical advice.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Palpitations",
+        "keywords": [
+            "palpitation",
+            "heart racing",
+            "rapid heartbeat",
+            "skipped beats"
+        ],
+        "title": "Palpitations Noted",
+        "message": "If persistent, with dizziness, chest pain, or fainting, seek medical evaluation.",
+        "risk": "high"
+    },
+    {
+        "name": "Fainting",
+        "keywords": [
+            "faint",
+            "fainting",
+            "passed out",
+            "loss of consciousness"
+        ],
+        "title": "Fainting Noted",
+        "message": "Ensure safety and seek medical evaluation promptly, especially if associated with chest pain, palpitations, or shortness of breath.",
+        "risk": "high"
+    },
+    {
+        "name": "Bleeding",
+        "keywords": [
+            "bleeding",
+            "hemorrhage",
+            "blood loss"
+        ],
+        "title": "Bleeding Noted",
+        "message": "Apply direct pressure to bleeding if safe to do so. If heavy bleeding or uncontrolled, seek emergency care immediately.",
+        "risk": "high"
+    },
+    {
+        "name": "Injury",
+        "keywords": [
+            "injury",
+            "leg injury",
+            "trauma",
+            "fracture",
+            "broken bone"
+        ],
+        "title": "Injury Noted",
+        "message": "Protect the injured area, avoid weight-bearing if a limb is involved, and seek medical evaluation. For severe pain, deformity, or open wounds, seek urgent care.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Heart Attack",
+        "keywords": [
+            "heart attack",
+            "myocardial infarction"
+        ],
+        "title": "Possible Heart Attack",
+        "message": "Chest discomfort with concern for heart attack is an emergency. Call emergency services and seek immediate care.",
+        "risk": "high"
+    },
+    {
+        "name": "Emergency",
+        "keywords": [
+            "emergency",
+            "911",
+            "call ambulance",
+            "need help now"
+        ],
+        "title": "Emergency Mentioned",
+        "message": "You mentioned an emergency. If you or someone is in immediate danger, call local emergency services right away.",
+        "risk": "high"
+    },
+    {
+        "name": "Help",
+        "keywords": [
+            "help",
+            "need help",
+            "assist",
+            "assistance"
+        ],
+        "title": "Help Requested",
+        "message": "You asked for help. If this is a medical emergency or someone is in danger, call local emergency services right away.",
+        "risk": "high"
+    },
+    {
+        "name": "Pain",
+        "keywords": [
+            "pain",
+            "paining",
+            "aching",
+            "hurts"
+        ],
+        "title": "Pain Noted",
+        "message": "Pain can range in severity. If severe, worsening, sudden, or with chest pain/shortness of breath/fever, seek medical evaluation.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Dengue",
+        "keywords": [
+            "dengue",
+            "dengu"
+        ],
+        "title": "Dengue Concern",
+        "message": "Fever, aches, and bleeding risk can occur with dengue. Stay hydrated and seek medical evaluation, especially if abdominal pain, vomiting, or bleeding/bruising appear.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Typhoid",
+        "keywords": [
+            "typhoid"
+        ],
+        "title": "Typhoid Concern",
+        "message": "Typhoid can present with fever and abdominal symptoms. Seek medical evaluation for testing and treatment.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Malaria",
+        "keywords": [
+            "malaria"
+        ],
+        "title": "Malaria Concern",
+        "message": "Malaria can be serious. If fever follows travel to or residence in malaria areas, seek medical evaluation promptly.",
+        "risk": "high"
+    },
+    {
+        "name": "Flu",
+        "keywords": [
+            "flu",
+            "influenza"
+        ],
+        "title": "Flu-like Illness",
+        "message": "Rest, hydrate, and monitor. If breathing difficulty, chest pain, or persistent high fever occur, seek medical care.",
+        "risk": "elevated"
+    },
+    {
+        "name": "COVID",
+        "keywords": [
+            "covid",
+            "corona",
+            "sars-cov-2"
+        ],
+        "title": "COVID-like Illness",
+        "message": "Monitor symptoms, isolate as appropriate, hydrate, and rest. If shortness of breath, chest pain, or low oxygen levels occur, seek urgent care.",
+        "risk": "elevated"
+    },
+    {
+        "name": "Infection",
+        "keywords": [
+            "infection",
+            "infected"
+        ],
+        "title": "Infection Mentioned",
+        "message": "Monitor for fever, redness, swelling, or worsening pain. If severe symptoms or spreading, seek medical evaluation.",
+        "risk": "elevated"
+    }
+]

@@ -1,13 +1,15 @@
-import React, { useState, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import AudioRecorder from './AudioRecorder'
 import './App.css'
 
 function App() {
+  const [activeTab, setActiveTab] = useState('home')
   const [entries, setEntries] = useState([])
   const [latestAdvice, setLatestAdvice] = useState(null)
   const [manualText, setManualText] = useState('')
   const [isCalling, setIsCalling] = useState(false)
   const [callStatus, setCallStatus] = useState(null)
+  const [rules, setRules] = useState([])
   const emergencyTriggeredRef = useRef(false)
 
   const riskPalette = useMemo(() => ({
@@ -16,227 +18,54 @@ function App() {
     high: '#f44336'
   }), [])
 
-  const SYMPTOM_RULES = useMemo(() => ([
-    // Respiratory and cardiac
-    {
-      name: 'Chest Pain',
-      keywords: [/chest pain/, /tight chest/, /pressure chest/, /angina/],
-      title: 'Elevated Concern',
-      message: 'Chest pain can be serious. Seek urgent medical attention or call emergency services if severe, sudden, radiating, or with shortness of breath.',
-      risk: 'high'
-    },
-    {
-      name: 'Shortness of Breath',
-      keywords: [/shortness of breath/, /hard to breathe/, /breathless/, /difficulty breathing/, /cant breathe/, /cant breath/],
-      title: 'Breathing Concern',
-      message: 'Breathing difficulty warrants caution. If sudden, severe, or with chest pain, seek urgent medical attention.',
-      risk: 'high'
-    },
-    {
-      name: 'Cough',
-      keywords: [/cough/, /coughing/],
-      title: 'Cough Noted',
-      message: 'Stay hydrated. If cough is persistent, with fever or shortness of breath, or produces blood, seek medical advice.',
-      risk: 'elevated'
-    },
-    // Fever and infection
-    {
-      name: 'Fever',
-      keywords: [/fever/, /high temp/, /temperature/, /hot/i],
-      title: 'Fever Detected',
-      message: 'Monitor temperature, hydrate, and rest. If fever exceeds 103°F (39.4°C), lasts >3 days, or pairs with chest pain or shortness of breath, seek care promptly.',
-      risk: 'elevated'
-    },
-    {
-      name: 'Sore Throat',
-      keywords: [/sore throat/, /throat pain/, /scratchy throat/],
-      title: 'Sore Throat Noted',
-      message: 'Hydrate, use warm saline gargles, and rest. If severe pain, trouble swallowing, or high fever, seek medical advice.',
-      risk: 'elevated'
-    },
-    // Neuro/head
-    {
-      name: 'Headache',
-      keywords: [/headache/, /migraine/],
-      title: 'Headache Noted',
-      message: 'Rest, hydrate, and consider appropriate OTC relief. If sudden severe “worst-ever” headache, with fever, neck stiffness, or neuro symptoms, seek care urgently.',
-      risk: 'elevated'
-    },
-    {
-      name: 'Dizziness',
-      keywords: [/dizzy/, /dizziness/, /lightheaded/],
-      title: 'Dizziness Noted',
-      message: 'Sit or lie down to avoid falls, hydrate, and rise slowly. If severe, persistent, fainting, or with chest pain/shortness of breath, seek care.',
-      risk: 'elevated'
-    },
-    {
-      name: 'Confusion',
-      keywords: [/confused/, /confusion/, /disoriented/],
-      title: 'Confusion Noted',
-      message: 'Confusion is concerning. Ensure safety, and seek medical evaluation promptly, especially if sudden onset.',
-      risk: 'high'
-    },
-    // GI
-    {
-      name: 'Nausea',
-      keywords: [/nausea/, /nauseous/, /vomit/, /vomiting/],
-      title: 'Nausea/Vomiting Noted',
-      message: 'Small sips of clear fluids and rest. If unable to keep fluids down, signs of dehydration, blood in vomit, or severe pain, seek care.',
-      risk: 'elevated'
-    },
-    {
-      name: 'Diarrhea',
-      keywords: [/diarrhea/, /loose stool/],
-      title: 'Diarrhea Noted',
-      message: 'Hydrate with electrolytes. If persistent, bloody, with fever, or signs of dehydration, seek medical advice.',
-      risk: 'elevated'
-    },
-    {
-      name: 'Abdominal Pain',
-      keywords: [/abdominal pain/, /stomach pain/, /belly pain/, /abdomen hurts/],
-      title: 'Abdominal Pain Noted',
-      message: 'Rest, hydrate, and monitor. If severe, worsening, localized (e.g., right-lower abdomen), or with fever/vomiting, seek medical care.',
-      risk: 'elevated'
-    },
-    // Other common concerns
-    {
-      name: 'Rash',
-      keywords: [/rash/, /hives/],
-      title: 'Rash Noted',
-      message: 'Monitor the rash. If rapidly spreading, painful, with fever or breathing issues, seek medical attention.',
-      risk: 'elevated'
-    },
-    {
-      name: 'Fatigue',
-      keywords: [/fatigue/, /tiredness/, /exhausted/],
-      title: 'Fatigue Noted',
-      message: 'Rest and hydrate. If severe, persistent, or with chest pain, shortness of breath, or weight loss, seek medical advice.',
-      risk: 'elevated'
-    },
-    {
-      name: 'Palpitations',
-      keywords: [/palpitation/, /heart racing/, /rapid heartbeat/, /skipped beats/],
-      title: 'Palpitations Noted',
-      message: 'If persistent, with dizziness, chest pain, or fainting, seek medical evaluation.',
-      risk: 'high'
-    },
-    {
-      name: 'Fainting',
-      keywords: [/faint/, /fainting/, /passed out/, /loss of consciousness/],
-      title: 'Fainting Noted',
-      message: 'Ensure safety and seek medical evaluation promptly, especially if associated with chest pain, palpitations, or shortness of breath.',
-      risk: 'high'
-    },
-    // Trauma / bleeding / emergency keywords
-    {
-      name: 'Bleeding',
-      keywords: [/bleeding/, /hemorrhage/, /blood loss/],
-      title: 'Bleeding Noted',
-      message: 'Apply direct pressure to bleeding if safe to do so. If heavy bleeding or uncontrolled, seek emergency care immediately.',
-      risk: 'high'
-    },
-    {
-      name: 'Injury',
-      keywords: [/injury/, /leg injury/, /trauma/, /fracture/, /broken bone/],
-      title: 'Injury Noted',
-      message: 'Protect the injured area, avoid weight-bearing if a limb is involved, and seek medical evaluation. For severe pain, deformity, or open wounds, seek urgent care.',
-      risk: 'elevated'
-    },
-    {
-      name: 'Heart Attack',
-      keywords: [/heart attack/, /myocardial infarction/],
-      title: 'Possible Heart Attack',
-      message: 'Chest discomfort with concern for heart attack is an emergency. Call emergency services and seek immediate care.',
-      risk: 'high'
-    },
-    {
-      name: 'Emergency',
-      keywords: [/emergency/, /emergenc(y|v|vy)/, /911/, /call ambulance/, /need help now/],
-      title: 'Emergency Mentioned',
-      message: 'You mentioned an emergency. If you or someone is in immediate danger, call local emergency services right away.',
-      risk: 'high'
-    },
-    {
-      name: 'Help',
-      keywords: [/help/, /need help/, /assist/, /assistance/],
-      title: 'Help Requested',
-      message: 'You asked for help. If this is a medical emergency or someone is in danger, call local emergency services right away.',
-      risk: 'high'
-    },
-    {
-      name: 'Pain',
-      keywords: [/pain/, /paining/, /aching/, /hurts/],
-      title: 'Pain Noted',
-      message: 'Pain can range in severity. If severe, worsening, sudden, or with chest pain/shortness of breath/fever, seek medical evaluation.',
-      risk: 'elevated'
-    },
-    // Infectious diseases (high-level cues)
-    {
-      name: 'Dengue',
-      keywords: [/dengue/, /dengu/],
-      title: 'Dengue Concern',
-      message: 'Fever, aches, and bleeding risk can occur with dengue. Stay hydrated and seek medical evaluation, especially if abdominal pain, vomiting, or bleeding/bruising appear.',
-      risk: 'elevated'
-    },
-    {
-      name: 'Typhoid',
-      keywords: [/typhoid/],
-      title: 'Typhoid Concern',
-      message: 'Typhoid can present with fever and abdominal symptoms. Seek medical evaluation for testing and treatment.',
-      risk: 'elevated'
-    },
-    {
-      name: 'Malaria',
-      keywords: [/malaria/],
-      title: 'Malaria Concern',
-      message: 'Malaria can be serious. If fever follows travel to or residence in malaria areas, seek medical evaluation promptly.',
-      risk: 'high'
-    },
-    {
-      name: 'Flu',
-      keywords: [/flu/, /influenza/],
-      title: 'Flu-like Illness',
-      message: 'Rest, hydrate, and monitor. If breathing difficulty, chest pain, or persistent high fever occur, seek medical care.',
-      risk: 'elevated'
-    },
-    {
-      name: 'COVID',
-      keywords: [/covid/, /corona/, /sars-cov-2/],
-      title: 'COVID-like Illness',
-      message: 'Monitor symptoms, isolate as appropriate, hydrate, and rest. If shortness of breath, chest pain, or low oxygen levels occur, seek urgent care.',
-      risk: 'elevated'
-    },
-    {
-      name: 'Infection',
-      keywords: [/infection/, /infected/],
-      title: 'Infection Mentioned',
-      message: 'Monitor for fever, redness, swelling, or worsening pain. If severe symptoms or spreading, seek medical evaluation.',
-      risk: 'elevated'
+  useEffect(() => {
+    fetchRules()
+    fetchHistory()
+    // Poll history every 10 seconds to stay updated
+    const interval = setInterval(fetchHistory, 10000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const fetchRules = async () => {
+    try {
+      const resp = await fetch('http://localhost:8000/rules')
+      const data = await resp.json()
+      setRules(data)
+    } catch (err) {
+      console.error('Failed to fetch rules', err)
     }
-  ]), [])
+  }
 
-  const generateAdvice = (transcript) => {
-    const text = transcript.toLowerCase()
-    const matches = SYMPTOM_RULES.filter(rule =>
-      rule.keywords.some(re => re.test(text))
-    )
+  const fetchHistory = async () => {
+    try {
+      const resp = await fetch('http://localhost:8000/history')
+      const data = await resp.json()
+      setEntries(data)
+    } catch (err) {
+      console.error('Failed to fetch history', err)
+    }
+  }
 
-    if (matches.length > 0) {
-      // Pick the highest-risk match (high > elevated > low)
-      const priority = { high: 3, elevated: 2, low: 1 }
-      const best = matches.sort((a, b) => priority[b.risk] - priority[a.risk])[0]
-      return {
-        title: best.title,
-        message: best.message,
-        risk: best.risk
+  const handleTranscript = async (transcript) => {
+    try {
+      const response = await fetch('http://localhost:8000/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript }),
+      })
+      const advice = await response.json()
+
+      setLatestAdvice(advice)
+      speakAdvice(advice.message)
+      fetchHistory() // Refresh history
+
+      if (advice.risk === 'high') {
+        setIsCalling(true)
+        // Simulation delay for call status
+        setTimeout(() => setIsCalling(false), 5000)
       }
-    }
-
-    // Fallback: unclear/other text
-    return {
-      title: 'General Guidance',
-      message: 'I could not detect a clear symptom. Please mention your symptom (e.g., “fever”, “chest pain”, “shortness of breath”). If you feel unwell, seek medical advice.',
-      risk: 'low'
+    } catch (err) {
+      console.error('Failed to analyze transcript', err)
     }
   }
 
@@ -249,63 +78,10 @@ function App() {
     window.speechSynthesis.speak(utterance)
   }
 
-  const notifyEmergencyBackend = async (advice, transcript) => {
-    // For testing, we allow multiple triggers. In prod, use a formal debounce.
-    console.log('Sending emergency trigger to backend...', advice.title)
-
-    const context = {
-      risk: 'high',
-      reason: advice.title.replace(/\s+/g, '_').toLowerCase(),
-      symptoms: [], // could be enriched later with backend MedCAT output
-      confidence: 0.8,
-      transcript,
-    }
-
-    try {
-      setIsCalling(true)
-      setCallStatus(null)
-      const response = await fetch('http://localhost:8000/agent/emergency', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(context),
-      })
-      const data = await response.json()
-      console.log('Backend response:', data)
-      setCallStatus(data)
-
-      // Reset indicator after a delay
-      setTimeout(() => {
-        setIsCalling(false)
-      }, 5000)
-    } catch (err) {
-      console.error('Failed to notify emergency action layer', err)
-      setIsCalling(false)
-      setCallStatus({ status: 'error', message: 'Network error' })
-    }
-  }
-
-  const handleTranscript = (transcript) => {
-    const advice = generateAdvice(transcript)
-
-    if (advice.risk === 'high') {
-      notifyEmergencyBackend(advice, transcript)
-    }
-
-    setLatestAdvice(advice)
-    speakAdvice(advice.message)
-
-    setEntries(prev => [
-      {
-        id: Date.now(),
-        text: transcript,
-        timestamp: new Date().toLocaleTimeString(),
-        advice,
-      },
-      ...prev
-    ])
-  }
-
-  const clearTranscripts = () => {
+  const clearTranscripts = async () => {
+    // In a real app, we'd have a DELETE /history endpoint. 
+    // For now, let's just clear local state if the backend doesn't support it yet, 
+    // or we could implement a simple clear on backend.
     setEntries([])
     setLatestAdvice(null)
   }
@@ -318,31 +94,199 @@ function App() {
     setManualText('')
   }
 
+  const renderHome = () => (
+    <>
+      <div className="search-area">
+        <form className="manual-form" onSubmit={handleManualSubmit}>
+          <span className="search-icon">🔍</span>
+          <input
+            type="text"
+            value={manualText}
+            onChange={(e) => setManualText(e.target.value)}
+            placeholder="Search symptoms or patient events..."
+            aria-label="Search symptoms"
+          />
+          <button type="submit">Analyze</button>
+        </form>
+      </div>
+
+      <div className="categories-row">
+        <div className="chip active">All Events</div>
+        <div className="chip" onClick={() => handleTranscript("I feel dizzy")}>Dizziness</div>
+        <div className="chip" onClick={() => handleTranscript("I have a fever")}>Fever</div>
+        <div className="chip" onClick={() => handleTranscript("My chest hurts")}>Chest Pain</div>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '1rem', alignItems: 'center', fontSize: '0.8rem', color: '#64748b' }}>
+          <span className="pulse-dot"></span>
+          <strong>{rules.length} Clinical Rules Active</strong>
+        </div>
+      </div>
+
+      <section className="hero-section">
+        <div className="banner-card">
+          <div className="banner-image-placeholder">💊</div>
+          <div className="banner-subtitle">Current Patient Status</div>
+          <h2 className="banner-title">
+            {latestAdvice ? latestAdvice.title : "Waiting for Input"}
+          </h2>
+          <p className="banner-subtitle">
+            {latestAdvice ? latestAdvice.message : "Use voice or text to describe patient symptoms for immediate agentic analysis."}
+          </p>
+        </div>
+      </section>
+
+      <section className="recorder-section">
+        <AudioRecorder onTranscript={handleTranscript} />
+      </section>
+
+      <section className="symptoms-section">
+        <div className="section-header">
+          <h2>Quick Diagnostic Shortcuts</h2>
+        </div>
+        <div className="symptom-icons-row">
+          {rules.slice(0, 5).map(rule => (
+            <div key={rule.name} className="symptom-item" onClick={() => handleTranscript(`I have ${rule.name.toLowerCase()}`)}>
+              <div className="icon-circle">
+                {rule.risk === 'high' ? '🚨' : rule.name.includes('Chest') ? '🫀' : rule.name.includes('Head') ? '🧠' : '🌡️'}
+              </div>
+              <span className="symptom-label">{rule.name}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
+  )
+
+  const renderHistory = () => (
+    <div className="history-view" style={{ padding: '2rem' }}>
+      <header className="section-header" style={{ marginBottom: '2rem' }}>
+        <h2>Full Event Timeline</h2>
+        <p style={{ color: '#64748b' }}>Comprehensive history of all detected medical events.</p>
+      </header>
+      <div className="history-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+        {entries.map(item => (
+          <div key={item.id} className="transcript-card" style={{ margin: 0 }}>
+            <div className="card-status-indicator" style={{ background: riskPalette[item.advice?.risk || 'low'] }}></div>
+            <div className="card-content">
+              <div className="card-top">
+                <span className="card-status-label" style={{ color: riskPalette[item.advice?.risk || 'low'] }}>
+                  {item.advice?.risk.toUpperCase() || 'NORMAL'}
+                </span>
+                <span className="card-time">{item.timestamp}</span>
+              </div>
+              <div className="card-text">{item.text}</div>
+              <div className="card-advice" style={{ fontSize: '0.85rem', marginTop: '0.5rem', color: '#64748b' }}>
+                {item.advice?.title}
+              </div>
+            </div>
+          </div>
+        ))}
+        {entries.length === 0 && (
+          <div style={{ textAlign: 'center', gridColumn: '1/-1', padding: '5rem', color: '#94a3b8' }}>
+            <p>No medical history available yet.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
+  const renderStats = () => {
+    const stats = entries.reduce((acc, item) => {
+      acc[item.advice?.risk || 'low'] = (acc[item.advice?.risk || 'low'] || 0) + 1
+      return acc
+    }, {})
+
+    const total = entries.length || 1
+
+    return (
+      <div className="stats-view" style={{ padding: '2rem' }}>
+        <header className="section-header" style={{ marginBottom: '2rem' }}>
+          <h2>Health Analytics</h2>
+          <p style={{ color: '#64748b' }}>Real-time risk distribution and event statistics.</p>
+        </header>
+
+        <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
+          <div className="stat-card" style={{ background: 'white', padding: '2rem', borderRadius: '24px', border: '1px solid #f3f4f6', textAlign: 'center' }}>
+            <h3 style={{ color: '#f44336', fontSize: '2.5rem', marginBottom: '0.5rem' }}>{stats.high || 0}</h3>
+            <p style={{ fontWeight: 700, color: '#64748b' }}>High Risk Events</p>
+            <div style={{ height: '4px', background: '#f44336', width: `${((stats.high || 0) / total) * 100}%`, margin: '1rem auto 0', borderRadius: '2px' }}></div>
+          </div>
+          <div className="stat-card" style={{ background: 'white', padding: '2rem', borderRadius: '24px', border: '1px solid #f3f4f6', textAlign: 'center' }}>
+            <h3 style={{ color: '#ffb74d', fontSize: '2.5rem', marginBottom: '0.5rem' }}>{stats.elevated || 0}</h3>
+            <p style={{ fontWeight: 700, color: '#64748b' }}>Elevated Risk Events</p>
+            <div style={{ height: '4px', background: '#ffb74d', width: `${((stats.elevated || 0) / total) * 100}%`, margin: '1rem auto 0', borderRadius: '2px' }}></div>
+          </div>
+          <div className="stat-card" style={{ background: 'white', padding: '2rem', borderRadius: '24px', border: '1px solid #f3f4f6', textAlign: 'center' }}>
+            <h3 style={{ color: '#4caf50', fontSize: '2.5rem', marginBottom: '0.5rem' }}>{stats.low || 0}</h3>
+            <p style={{ fontWeight: 700, color: '#64748b' }}>Low Risk/Normal</p>
+            <div style={{ height: '4px', background: '#4caf50', width: `${((stats.low || 0) / total) * 100}%`, margin: '1rem auto 0', borderRadius: '2px' }}></div>
+          </div>
+        </div>
+
+        <div className="summary-chart" style={{ marginTop: '3rem', background: '#f8fafc', padding: '2rem', borderRadius: '24px' }}>
+          <h3>Event Frequency</h3>
+          <p>Total events recorded: {entries.length}</p>
+        </div>
+      </div>
+    )
+  }
+
+  const renderClinicalRules = () => (
+    <div className="rules-view" style={{ padding: '2rem' }}>
+      <header className="section-header" style={{ marginBottom: '2rem' }}>
+        <h2>Dynamic Clinical Rules Engine</h2>
+        <p style={{ color: '#64748b' }}>Currently active monitoring parameters fetched live from the MedAlert Backend.</p>
+      </header>
+      <div className="rules-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+        {rules.map(rule => (
+          <div key={rule.name} className="rule-card" style={{ background: 'white', padding: '1.5rem', borderRadius: '20px', border: '1px solid #f3f4f6', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800 }}>{rule.name}</h3>
+              <span style={{
+                padding: '0.2rem 0.6rem',
+                borderRadius: '6px',
+                fontSize: '0.7rem',
+                fontWeight: 800,
+                color: 'white',
+                background: riskPalette[rule.risk]
+              }}>{rule.risk.toUpperCase()}</span>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+              {rule.keywords.map(kw => (
+                <span key={kw} style={{ background: '#f1f5f9', color: '#475569', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>
+                  {kw}
+                </span>
+              ))}
+            </div>
+            <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: '1.4' }}>{rule.message}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
   return (
     <div className="app">
-      {/* Sidebar Navigation */}
       <aside className="sidebar">
         <div className="sidebar-logo">🏥</div>
-        <div className="nav-item active">
+        <div className={`nav-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>
           <span className="nav-icon">🏠</span>
           <span className="nav-label">Home</span>
         </div>
-        <div className="nav-item">
+        <div className={`nav-item ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
           <span className="nav-icon">📜</span>
           <span className="nav-label">History</span>
         </div>
-        <div className="nav-item">
+        <div className={`nav-item ${activeTab === 'stats' ? 'active' : ''}`} onClick={() => setActiveTab('stats')}>
           <span className="nav-icon">📊</span>
           <span className="nav-label">Stats</span>
         </div>
-        <div className="nav-item">
-          <span className="nav-icon">👤</span>
-          <span className="nav-label">Profile</span>
+        <div className={`nav-item ${activeTab === 'rules' ? 'active' : ''}`} onClick={() => setActiveTab('rules')}>
+          <span className="nav-icon">📋</span>
+          <span className="nav-label">Rules</span>
         </div>
       </aside>
 
       <div className="app-container">
-        {/* Emergency Overlay */}
         {latestAdvice && latestAdvice.risk === 'high' && !emergencyTriggeredRef.current && (
           <div className="alert-overlay">
             <div className="alert-icon-big">🚨</div>
@@ -350,7 +294,7 @@ function App() {
             <p>{latestAdvice.message}</p>
             {isCalling && (
               <div className="call-status-detail" style={{ color: 'white', marginTop: '1rem', fontWeight: 700 }}>
-                {callStatus?.is_dry_run ? "Simulation Mode: No real call made." : "Autonomous Call Initiated..."}
+                Autonomous Call Initiated...
               </div>
             )}
             <button className="btn-dismiss" onClick={() => emergencyTriggeredRef.current = true}>
@@ -370,79 +314,18 @@ function App() {
             </div>
           </header>
 
-          <div className="search-area">
-            <form className="manual-form" onSubmit={handleManualSubmit}>
-              <span className="search-icon">🔍</span>
-              <input
-                type="text"
-                value={manualText}
-                onChange={(e) => setManualText(e.target.value)}
-                placeholder="Search symptoms or patient events..."
-                aria-label="Search symptoms"
-              />
-              <button type="submit">Analyze</button>
-            </form>
-          </div>
-
-          <div className="categories-row">
-            <div className="chip active">All Events</div>
-            <div className="chip">High Risk</div>
-            <div className="chip">Elevated</div>
-            <div className="chip">Normal</div>
-          </div>
-
-          <section className="hero-section">
-            <div className="banner-card">
-              <div className="banner-image-placeholder">💊</div>
-              <div className="banner-subtitle">Current Patient Status</div>
-              <h2 className="banner-title">
-                {latestAdvice ? latestAdvice.title : "Waiting for Input"}
-              </h2>
-              <p className="banner-subtitle">
-                {latestAdvice ? latestAdvice.message : "Use voice or text to describe patient symptoms for immediate agentic analysis."}
-              </p>
-            </div>
-          </section>
-
-          <section className="recorder-section">
-            <AudioRecorder onTranscript={handleTranscript} />
-          </section>
-
-          <section className="symptoms-section">
-            <div className="section-header">
-              <h2>Quick Diagnostic Shortcuts</h2>
-            </div>
-            <div className="symptom-icons-row">
-              <div className="symptom-item" onClick={() => handleTranscript("I have chest pain")}>
-                <div className="icon-circle">🫀</div>
-                <span className="symptom-label">Chest Pain</span>
-              </div>
-              <div className="symptom-item" onClick={() => handleTranscript("I have a headache")}>
-                <div className="icon-circle">🧠</div>
-                <span className="symptom-label">Neurological</span>
-              </div>
-              <div className="symptom-item" onClick={() => handleTranscript("I have a fever")}>
-                <div className="icon-circle">🌡️</div>
-                <span className="symptom-label">Vitals/Fever</span>
-              </div>
-              <div className="symptom-item" onClick={() => handleTranscript("I am coughing")}>
-                <div className="icon-circle">🫁</div>
-                <span className="symptom-label">Respiratory</span>
-              </div>
-              <div className="symptom-item" onClick={() => handleTranscript("I am bleeding heavily")}>
-                <div className="icon-circle">🩸</div>
-                <span className="symptom-label">Bleeding/Trauma</span>
-              </div>
-            </div>
-          </section>
+          {activeTab === 'home' && renderHome()}
+          {activeTab === 'history' && renderHistory()}
+          {activeTab === 'stats' && renderStats()}
+          {activeTab === 'rules' && renderClinicalRules()}
         </main>
 
         <aside className="history-panel">
           <div className="panel-header">
-            <h2>Emergency History</h2>
+            <h2>Recent Activities</h2>
             {entries.length > 0 && (
               <button className="btn-clear" style={{ background: 'none', border: 'none', color: '#3b82f6', fontWeight: 600, cursor: 'pointer' }} onClick={clearTranscripts}>
-                Clear All
+                Clear
               </button>
             )}
           </div>
@@ -453,7 +336,7 @@ function App() {
                 <p>No recent activities detected.</p>
               </div>
             ) : (
-              entries.map((item) => (
+              entries.slice(0, 5).map((item) => (
                 <div key={item.id} className="transcript-card">
                   <div
                     className="card-status-indicator"
